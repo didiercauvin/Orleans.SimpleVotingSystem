@@ -1,10 +1,18 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Spectre.Console;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Color = Spectre.Console.Color;
 
-var http = new HttpClient { BaseAddress = new Uri("https://localhost:7150") };
+IConfigurationRoot config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables()
+    .Build();
+
+var sondageApiUrl = config.GetRequiredSection("VotingApi").GetValue<string>("Url");
+
+var http = new HttpClient { BaseAddress = new Uri(sondageApiUrl) };
 
 AnsiConsole.Write(
     new FigletText("Elap Vote")
