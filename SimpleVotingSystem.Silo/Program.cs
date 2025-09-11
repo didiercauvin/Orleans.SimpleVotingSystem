@@ -78,8 +78,11 @@ using var host = Host.CreateDefaultBuilder(args)
             options.CounterUpdateIntervalMs = 5000;
         });
 
-        siloBuilder
-            .AddMemoryGrainStorage("pollStore");
+        siloBuilder.AddAdoNetGrainStorage("pollStore", options =>
+        {
+            options.Invariant = "System.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
+            options.ConnectionString = connectionString;
+        });
 
     })
     .Build();
