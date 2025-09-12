@@ -12,6 +12,7 @@ public static class PollEndpoints
                 .UseConsultPollResultsEndpoint()
                 .UseGetAllPollsEndpoint()
                 .UseCreatePollEndpoint()
-                .UseVoteForPollEndpoint();
+                .UseVoteForPollEndpoint()
+                .UseGetStatisticsEndpoint();
     }
 }

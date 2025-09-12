@@ -24,7 +24,7 @@ while (true)
     var choice = AnsiConsole.Prompt(
         new SelectionPrompt<string>()
             .Title("[green]Que veux-tu faire ?[/]")
-            .AddChoices("Créer un sondage", "Voter", "Voir résultats", "Quitter"));
+            .AddChoices("Créer un sondage", "Voter", "Voir résultats", "Voir les stats globales", "Quitter"));
 
     switch (choice)
     {
@@ -40,9 +40,29 @@ while (true)
             await ConsultPollResults(http);
             break;
 
+        case "Voir les stats globales":
+            await ViewStatistics(http);
+            break;
+
         case "Quitter":
             return;
     }
+}
+
+async Task ViewStatistics(HttpClient http)
+{
+    var results = await http.GetFromJsonAsync<StatSondage[]>($"/polls/statistics", MyJsonContext.Default.StatSondageArray);
+
+    var table = new Table();
+    table.AddColumn("[yellow]Sondage[/]");
+    table.AddColumn("[cyan]Nb. votes[/]");
+
+    foreach (var r in results)
+    {
+        table.AddRow(r.Sondage, r.TotalVotes.ToString());
+    }
+
+    AnsiConsole.Write(table);
 }
 
 async Task ConsultResults(Sondage sondage)
@@ -141,11 +161,19 @@ public class SondageOption
     public int Votes { get; set; } = 0;
 }
 
+public class StatSondage
+{
+    public string Sondage { get; set; }
+    public int TotalVotes { get; set; }
+}
+
 [JsonSerializable(typeof(Sondage))]
 [JsonSerializable(typeof(List<Sondage>))]
 [JsonSerializable(typeof(SondageOption))]
 [JsonSerializable(typeof(SondageOption[]))]
 [JsonSerializable(typeof(VoteForPollDto))]
+[JsonSerializable(typeof(StatSondage))]
+[JsonSerializable(typeof(StatSondage[]))]
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 internal partial class MyJsonContext : JsonSerializerContext
 {

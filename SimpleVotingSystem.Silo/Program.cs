@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using SimpleVotingSystem.Silo;
@@ -18,6 +18,7 @@ using SimpleVotingSystem.Silo;
 
 var siloPort = int.Parse(Environment.GetEnvironmentVariable("ORLEANS_SILO_PORT") ?? "11111");
 var gatewayPort = int.Parse(Environment.GetEnvironmentVariable("ORLEANS_GATEWAY_PORT") ?? "30001");
+var siloName = Environment.GetEnvironmentVariable("SILO_NAME") ?? "JohnDoe";
 
 using var host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((context, config) =>
@@ -59,6 +60,11 @@ using var host = Host.CreateDefaultBuilder(args)
             options.ConnectionString = connectionString;
         });
 
+        siloBuilder.Configure<SiloOptions>(options =>
+        {
+            options.SiloName = siloName;
+        });
+
         siloBuilder.Configure<ClusterOptions>(options =>
         {
             options.ClusterId = "sondage-app-orleans";
@@ -74,6 +80,7 @@ using var host = Host.CreateDefaultBuilder(args)
         siloBuilder.UseDashboard(options =>
         {
             //options.Port = int.Parse(Environment.GetEnvironmentVariable("DASHBOARD_PORT") ?? "0");
+            options.Host = "*";
             options.HostSelf = true;
             options.CounterUpdateIntervalMs = 5000;
         });
