@@ -11,7 +11,7 @@ public static class GetPollsEndpoint
     {
         endpoint.MapGet("/", async (IGrainFactory grainFactory) =>
         {
-            var pollGrain = grainFactory.GetGrain<IPollCatalogGrain>(0);
+            var pollGrain = grainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty);
             var polls = await pollGrain.GetAllPolls();
             return polls.Select(p => new PollResult(p.Id, p.Libelle, p.Options.Select(option => new PollOptionResult(option.Id, option.Libelle)).ToArray()));
         });

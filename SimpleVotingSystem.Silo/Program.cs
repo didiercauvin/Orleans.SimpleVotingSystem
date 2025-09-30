@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using SimpleVotingSystem.Polls;
 using SimpleVotingSystem.Silo;
 
 //using var host = Host.CreateDefaultBuilder(args)
@@ -43,6 +44,7 @@ using var host = Host.CreateDefaultBuilder(args)
 
         config.ConfigureServices(services =>
         {
+            services.AddPlacementDirector<SamplePlacementStrategy, SamplePlacementStrategyFixedSiloDirector>();
             services.AddRouting();
             services.AddHealthChecks().AddCheck<SiloHealthcheck>("silo");
         });

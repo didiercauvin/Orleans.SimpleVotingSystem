@@ -18,7 +18,7 @@ public class PollStatisticsGrain : Grain, IPollStatisticsGrain
 {
     public async Task<PollStatistic[]> GetTotalVotes()
     {
-        var catalog = GrainFactory.GetGrain<IPollCatalogGrain>(0);
+        var catalog = GrainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty);
         var polls = await catalog.GetAllPolls();
 
         return polls.Select(p => new PollStatistic
@@ -30,7 +30,7 @@ public class PollStatisticsGrain : Grain, IPollStatisticsGrain
 
     public async Task<PollOption?> GetMostPopularOption()
     {
-        var catalog = GrainFactory.GetGrain<IPollCatalogGrain>(0);
+        var catalog = GrainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty);
         var polls = await catalog.GetAllPolls();
 
         return polls.SelectMany(p => p.Options)

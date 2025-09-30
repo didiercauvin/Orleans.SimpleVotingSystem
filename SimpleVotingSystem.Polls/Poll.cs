@@ -8,6 +8,7 @@ public interface IPollGrain : IGrainWithGuidKey
     Task<Poll> GetPoll();
 }
 
+[SamplePlacementStrategy]
 public class PollGrain : Grain, IPollGrain
 {
     private readonly IPersistentState<PollState> _state;
@@ -31,7 +32,7 @@ public class PollGrain : Grain, IPollGrain
         await _state.WriteStateAsync();
 
         // Enregistrer ce sondage dans le catalogue
-        await GrainFactory.GetGrain<IPollCatalogGrain>(0).RegisterPoll(this.GetPrimaryKey());
+        await GrainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty).RegisterPoll(this.GetPrimaryKey());
     }
 
     public async Task Vote(Guid optionId)

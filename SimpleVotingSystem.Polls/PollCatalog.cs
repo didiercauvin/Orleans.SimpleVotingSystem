@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace SimpleVotingSystem.Polls;
 
-public interface IPollCatalogGrain : IGrainWithIntegerKey
+public interface IPollCatalogGrain : IGrainWithGuidKey
 {
     Task RegisterPoll(Guid pollId);
     Task<List<Poll>> GetAllPolls();
 }
 
+[SamplePlacementStrategy]
 public class PollCatalogGrain : Grain, IPollCatalogGrain
 {
     private readonly IPersistentState<List<Guid>> _pollIds;
