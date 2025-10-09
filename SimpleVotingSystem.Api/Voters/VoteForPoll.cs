@@ -20,8 +20,10 @@ public static class VoteForPollEndPoint
         endpoint.MapPost("{id}/vote", async (string id, VoteForPollRequest request, IGrainFactory grainFactory) =>
         {
             var voterGrain = grainFactory.GetGrain<IVoterGrain>(id);
+            var pollGrain = grainFactory.GetGrain<IPollGrain>(request.PollId);
 
             await voterGrain.VoteAsync(request.PollId, request.OptionId);
+            await pollGrain.Vote(id, request.OptionId);
         });
 
         return endpoint;

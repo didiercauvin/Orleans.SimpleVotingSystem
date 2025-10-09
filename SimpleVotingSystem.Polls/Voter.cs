@@ -38,18 +38,6 @@ public class VoterGrain : Grain, IVoterGrain
         if (_state.State.Votes.Any(v => v.PollId == pollId))
             return false;
 
-        // Récupère le sondage
-        var poll = GrainFactory.GetGrain<IPollGrain>(pollId);
-        var pollData = await poll.GetPoll();
-        var option = pollData.Options.FirstOrDefault(o => o.Id == optionId);
-        if (option == null)
-            return false;
-
-        // Envoie le vote au sondage
-        var success = await poll.Vote(this.GetPrimaryKeyString(), optionId);
-        if (!success)
-            return false;
-
         // Enregistre le vote dans l'état du voter
         _state.State.Votes.Add(new VoteRecord
         {
