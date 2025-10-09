@@ -19,7 +19,7 @@ builder.Services
         //clientBuilder.UseLocalhostClustering();
         clientBuilder.UseAdoNetClustering(options =>
         {
-            options.Invariant = "System.Data.SqlClient"; // Pour SQL Server
+            options.Invariant = "Microsoft.Data.SqlClient"; // Pour SQL Server
             options.ConnectionString = connectionString;
         });
 
@@ -41,5 +41,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UsePollEndpoints();
+app.UseVotersEndpoints();
 
 app.Run();

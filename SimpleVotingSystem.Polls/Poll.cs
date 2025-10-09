@@ -3,7 +3,7 @@
 public interface IPollGrain : IGrainWithGuidKey
 {
     Task CreatePoll(Poll poll);
-    Task Vote(Guid optionId);
+    Task<bool> Vote(string voterId, Guid optionId);
     Task<PollOption[]> GetResults();
     Task<Poll> GetPoll();
 }
@@ -35,12 +35,20 @@ public class PollGrain : Grain, IPollGrain
         await GrainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty).RegisterPoll(this.GetPrimaryKey());
     }
 
-    public async Task Vote(Guid optionId)
+    public async Task<bool> Vote(string voterId, Guid optionId)
     {
+        if (_state.State.Voters.Contains(voterId))
+            return false; // L'utilisateur a déjà voté pour ce sondage
+
         var option = _state.State.Poll.Options.FirstOrDefault(o => o.Id == optionId);
+        if (option == null)
+            return false;
+
         option.Votes++;
+        _state.State.Voters.Add(voterId);
 
         await _state.WriteStateAsync();
+        return true;
     }
 
     public Task<Poll> GetPoll()
@@ -81,6 +89,7 @@ public class PollState
 {
     public Poll? Poll { get; set; }
     public PollOption[] Options { get; set; } = [];
+    public HashSet<string> Voters { get; set; } = new();
 
 }
 

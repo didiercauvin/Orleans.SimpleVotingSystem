@@ -19,35 +19,54 @@ AnsiConsole.Write(
         .Centered()
         .Color(Color.DarkCyan));
 
-while (true)
+string voterIdFile = "voter.id";
+string voterId;
+
+if (!File.Exists(voterIdFile))
 {
-    var choice = AnsiConsole.Prompt(
-        new SelectionPrompt<string>()
-            .Title("[green]Que veux-tu faire ?[/]")
-            .AddChoices("Créer un sondage", "Voter", "Voir résultats", "Voir les stats globales", "Quitter"));
-
-    switch (choice)
-    {
-        case "Créer un sondage":
-            await CreatePoll(http);
-            break;
-
-        case "Voter":
-            await VoteForPoll(http);
-            break;
-
-        case "Voir résultats":
-            await ConsultPollResults(http);
-            break;
-
-        case "Voir les stats globales":
-            await ViewStatistics(http);
-            break;
-
-        case "Quitter":
-            return;
-    }
+    Console.Write("Entrez votre identifiant : ");
+    voterId = Console.ReadLine()?.Trim() ?? Guid.NewGuid().ToString();
+    File.WriteAllText(voterIdFile, voterId);
 }
+else
+{
+
+    voterId = File.ReadAllText(voterIdFile).Trim();
+}
+
+    while (true)
+    {
+        var choice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("[green]Que veux-tu faire ?[/]")
+                .AddChoices("Créer un sondage", "Voter", "Voir mes votes", "Voir résultats", "Voir les stats globales", "Quitter"));
+
+        switch (choice)
+        {
+            case "Créer un sondage":
+                await CreatePoll(http);
+                break;
+
+            case "Voter":
+                await VoteForPoll(http, voterId);
+                break;
+
+            case "Voir résultats":
+                await ConsultPollResults(http);
+                break;
+
+            case "Voir mes votes":
+                await ConsultMyPolls(http, voterId);
+                break;
+
+            case "Voir les stats globales":
+                await ViewStatistics(http);
+                break;
+
+            case "Quitter":
+                return;
+        }
+    }
 
 async Task ViewStatistics(HttpClient http)
 {
@@ -65,7 +84,7 @@ async Task ViewStatistics(HttpClient http)
     AnsiConsole.Write(table);
 }
 
-async Task ConsultResults(Sondage sondage)
+async Task ConsultResults(HttpClient http, Sondage sondage)
 {
     var results = await http.GetFromJsonAsync<SondageOption[]>($"/polls/{sondage.Id}/results", MyJsonContext.Default.SondageOptionArray);
 
@@ -81,7 +100,23 @@ async Task ConsultResults(Sondage sondage)
     AnsiConsole.Write(table);
 }
 
-async Task Voter(Sondage sondage)
+async Task ConsultMyPolls(HttpClient http, string voterId)
+{
+    var results = await http.GetFromJsonAsync<MonVote[]>($"/voters/{voterId}/results", MyJsonContext.Default.MonVoteArray);
+
+    var table = new Table();
+    table.AddColumn("[yellow]Sondage[/]");
+    table.AddColumn("[cyan]Choix[/]");
+
+    foreach (var r in results)
+    {
+        table.AddRow(r.Libelle, r.Choix);
+    }
+
+    AnsiConsole.Write(table);
+}
+
+async Task Voter(string voterId, Sondage sondage)
 {
     var choix = AnsiConsole.Prompt(
         new SelectionPrompt<SondageOption>()
@@ -89,10 +124,10 @@ async Task Voter(Sondage sondage)
             .UseConverter(o => o.Libelle!)
             .AddChoices(sondage.Options));
 
-    var vote = new VoteForPollDto { OptionId = choix.Id };
+    var vote = new VoteForPollDto { PollId = sondage.Id, OptionId = choix.Id };
 
     await http.PostAsJsonAsync<VoteForPollDto>(
-                $"/polls/{sondage.Id}/vote", vote, MyJsonContext.Default.VoteForPollDto);
+                $"/voters/{voterId}/vote", vote, MyJsonContext.Default.VoteForPollDto);
 
     AnsiConsole.MarkupLine($"Vous avez voté pour : [cyan]{choix.Libelle}[/] dans le sondage [green]{sondage.Libelle}[/]");
 }
@@ -118,7 +153,7 @@ static async Task CreatePoll(HttpClient http)
     AnsiConsole.MarkupLine($"[bold green]Sondage créé ![/] ID : [yellow]{pollId}[/]");
 }
 
-async Task VoteForPoll(HttpClient http)
+async Task VoteForPoll(HttpClient http, string voterId)
 {
     var sondages = await http.GetFromJsonAsync<List<Sondage>>("/polls", MyJsonContext.Default.ListSondage);
     var choixSondages = AnsiConsole.Prompt(
@@ -127,7 +162,7 @@ async Task VoteForPoll(HttpClient http)
             .UseConverter(s => s.Libelle!)
             .AddChoices(sondages!));
 
-    Voter(choixSondages);
+    await Voter(voterId, choixSondages);
 }
 
 async Task ConsultPollResults(HttpClient http)
@@ -139,11 +174,12 @@ async Task ConsultPollResults(HttpClient http)
             .UseConverter(s => s.Libelle!)
             .AddChoices(currentSondages!));
 
-    await ConsultResults(resultSondage);
+    await ConsultResults(http, resultSondage);
 }
 
 public class VoteForPollDto
 {
+    public Guid PollId { get; set; }
     public Guid OptionId { get; set; }
 }
 
@@ -161,6 +197,12 @@ public class SondageOption
     public int Votes { get; set; } = 0;
 }
 
+public class MonVote
+{
+    public string Libelle { get; set; }
+    public string Choix { get; set; }
+}
+
 public class StatSondage
 {
     public string Sondage { get; set; }
@@ -174,6 +216,8 @@ public class StatSondage
 [JsonSerializable(typeof(VoteForPollDto))]
 [JsonSerializable(typeof(StatSondage))]
 [JsonSerializable(typeof(StatSondage[]))]
+[JsonSerializable(typeof(MonVote))]
+[JsonSerializable(typeof(MonVote[]))]
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 internal partial class MyJsonContext : JsonSerializerContext
 {

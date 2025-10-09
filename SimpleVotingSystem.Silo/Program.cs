@@ -58,7 +58,7 @@ using var host = Host.CreateDefaultBuilder(args)
         //siloBuilder.UseLocalhostClustering(clusterId: "default", serviceId: "default");
         siloBuilder.UseAdoNetClustering(options =>
         {
-            options.Invariant = "System.Data.SqlClient"; // Pour SQL Server
+            options.Invariant = "Microsoft.Data.SqlClient"; // Pour SQL Server
             options.ConnectionString = connectionString;
         });
 
@@ -87,11 +87,13 @@ using var host = Host.CreateDefaultBuilder(args)
             options.CounterUpdateIntervalMs = 5000;
         });
 
-        siloBuilder.AddAdoNetGrainStorage("pollStore", options =>
-        {
-            options.Invariant = "System.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
-            options.ConnectionString = connectionString;
-        });
+        siloBuilder.AddMemoryGrainStorage("pollStore");
+
+        //siloBuilder.AddAdoNetGrainStorage("pollStore", options =>
+        //{
+        //    options.Invariant = "Microsoft.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
+        //    options.ConnectionString = connectionString;
+        //});
 
     })
     .Build();
