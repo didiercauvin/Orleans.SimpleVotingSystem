@@ -156,6 +156,13 @@ static async Task CreatePoll(HttpClient http)
 async Task VoteForPoll(HttpClient http, string voterId)
 {
     var sondages = await http.GetFromJsonAsync<List<Sondage>>("/polls", MyJsonContext.Default.ListSondage);
+
+    if (sondages == null || sondages.Count == 0)
+    {
+        AnsiConsole.MarkupLine("[yellow]Aucun sondage en ligne pour le moment.[/]");
+        return;
+    }
+
     var choixSondages = AnsiConsole.Prompt(
         new SelectionPrompt<Sondage>()
             .Title("[green]Sondages disponibles:[/]")
@@ -168,11 +175,18 @@ async Task VoteForPoll(HttpClient http, string voterId)
 async Task ConsultPollResults(HttpClient http)
 {
     var currentSondages = await http.GetFromJsonAsync<List<Sondage>>("/polls", MyJsonContext.Default.ListSondage);
+
+    if (currentSondages == null || currentSondages.Count == 0)
+    {
+        AnsiConsole.MarkupLine("[yellow]Aucun sondage en ligne pour le moment.[/]");
+        return;
+    }
+
     var resultSondage = AnsiConsole.Prompt(
         new SelectionPrompt<Sondage>()
             .Title("[green]Sondages disponibles:[/]")
             .UseConverter(s => s.Libelle!)
-            .AddChoices(currentSondages!));
+            .AddChoices(currentSondages));
 
     await ConsultResults(http, resultSondage);
 }
