@@ -10,6 +10,13 @@ public interface IPollGrain : IGrainWithGuidKey
     Task<Poll> GetPoll();
 }
 
+[GenerateSerializer]
+public record PollCreatedEvent
+{
+    [Id(0)]
+    public Guid PollId { get; set; }
+}
+
 [SamplePlacementStrategy]
 public class PollGrain : Grain, IPollGrain
 {
@@ -49,9 +56,6 @@ public class PollGrain : Grain, IPollGrain
         };
 
         await _state.WriteStateAsync();
-
-        // Enregistrer ce sondage dans le catalogue
-        await GrainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty).RegisterPoll(this.GetPrimaryKey());
     }
 
     private async Task<bool> Vote(string voterId, Guid optionId)

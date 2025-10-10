@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Providers;
 using SimpleVotingSystem.Polls;
 using SimpleVotingSystem.Silo;
 
@@ -92,11 +93,13 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddMemoryGrainStorage("PubSubStore")
             .AddMemoryStreams("votes-stream");
 
-        //siloBuilder.AddAdoNetGrainStorage("pollStore", options =>
+        //siloBuilder
+        //.AddAdoNetGrainStorage("pollStore", options =>
         //{
         //    options.Invariant = "Microsoft.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
         //    options.ConnectionString = connectionString;
         //});
+        
 
     })
     .Build();

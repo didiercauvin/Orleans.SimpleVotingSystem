@@ -2,6 +2,7 @@ using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using SimpleVotingSystem.Api.Polls;
+using SimpleVotingSystem.Polls;
 
 var builder = WebApplication.CreateBuilder(args);
 

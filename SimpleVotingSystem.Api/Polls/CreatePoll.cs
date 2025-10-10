@@ -34,6 +34,9 @@ public static class CreatePollEndPoint
                     Libelle = request.Libelle,
                     Options = request.Options.Select(o => new PollOption { Id = o.Id, Libelle = o.Libelle }).ToArray()
                 });
+
+            var catalog = grainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty);
+            await catalog.RegisterPoll(id);
         });
 
         return endpoint;

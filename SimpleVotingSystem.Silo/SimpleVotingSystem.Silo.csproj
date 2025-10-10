@@ -15,6 +15,7 @@
     <PackageReference Include="Microsoft.Orleans.Persistence.AdoNet" Version="9.2.1" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="9.2.1" />
     <PackageReference Include="Microsoft.Orleans.Streaming" Version="9.2.1" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="9.2.1" />
     <PackageReference Include="OrleansDashboard" Version="8.2.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
