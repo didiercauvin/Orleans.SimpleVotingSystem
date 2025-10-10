@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
+using Orleans.Hosting;
 using SimpleVotingSystem.Api.Polls;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,8 @@ builder.Services
             options.ClusterId = "sondage-app-orleans";
             options.ServiceId = "sondage-app-orleans";
         });
+
+        clientBuilder.AddMemoryStreams("vote-streams");
     });
 
 var app = builder.Build();

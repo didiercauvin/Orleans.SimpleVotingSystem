@@ -87,7 +87,10 @@ using var host = Host.CreateDefaultBuilder(args)
             options.CounterUpdateIntervalMs = 5000;
         });
 
-        siloBuilder.AddMemoryGrainStorage("pollStore");
+        siloBuilder
+            .AddMemoryGrainStorage("pollStore")
+            .AddMemoryGrainStorage("PubSubStore")
+            .AddMemoryStreams("votes-stream");
 
         //siloBuilder.AddAdoNetGrainStorage("pollStore", options =>
         //{

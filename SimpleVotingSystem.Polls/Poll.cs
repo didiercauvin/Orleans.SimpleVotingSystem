@@ -1,9 +1,11 @@
-﻿namespace SimpleVotingSystem.Polls;
+﻿using Orleans.Streams;
+
+namespace SimpleVotingSystem.Polls;
 
 public interface IPollGrain : IGrainWithGuidKey
 {
     Task CreatePoll(Poll poll);
-    Task<bool> Vote(string voterId, Guid optionId);
+    //Task<bool> Vote(string voterId, Guid optionId);
     Task<PollOption[]> GetResults();
     Task<Poll> GetPoll();
 }
@@ -12,10 +14,27 @@ public interface IPollGrain : IGrainWithGuidKey
 public class PollGrain : Grain, IPollGrain
 {
     private readonly IPersistentState<PollState> _state;
+    private StreamSubscriptionHandle<VoteCastEvent>? _subscription;
 
     public PollGrain([PersistentState("poll", "pollStore")] IPersistentState<PollState> state)
     {
         _state = state;
+    }
+
+    public override async Task OnActivateAsync(CancellationToken ct)
+    {
+        var streamProvider = this.GetStreamProvider("votes-stream");
+
+        var streamId = StreamId.Create("VoteStream", this.GetPrimaryKey().ToString());
+        // Le poll a une clé Guid, donc on utilise GetPrimaryKey()
+        var stream = streamProvider.GetStream<VoteCastEvent>(streamId);
+
+        _subscription = await stream.SubscribeAsync(OnVoteReceived);
+    }
+
+    private async Task OnVoteReceived(VoteCastEvent vote, StreamSequenceToken? token = null)
+    {
+        await Vote(vote.VoterId, vote.OptionId);
     }
 
     public async Task CreatePoll(Poll poll)
@@ -35,11 +54,8 @@ public class PollGrain : Grain, IPollGrain
         await GrainFactory.GetGrain<IPollCatalogGrain>(Guid.Empty).RegisterPoll(this.GetPrimaryKey());
     }
 
-    public async Task<bool> Vote(string voterId, Guid optionId)
+    private async Task<bool> Vote(string voterId, Guid optionId)
     {
-        if (_state.State.Voters.Contains(voterId))
-            return false; // L'utilisateur a déjà voté pour ce sondage
-
         var option = _state.State.Poll.Options.FirstOrDefault(o => o.Id == optionId);
         if (option == null)
             return false;

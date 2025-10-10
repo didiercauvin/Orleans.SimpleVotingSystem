@@ -23,7 +23,7 @@ public static class VoteForPollEndPoint
             var pollGrain = grainFactory.GetGrain<IPollGrain>(request.PollId);
 
             await voterGrain.VoteAsync(request.PollId, request.OptionId);
-            await pollGrain.Vote(id, request.OptionId);
+            //await pollGrain.Vote(id, request.OptionId);
         });
 
         return endpoint;
