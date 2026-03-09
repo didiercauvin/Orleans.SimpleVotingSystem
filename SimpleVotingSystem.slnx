@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Éléments de solution/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="SimpleVotingSystem.Api/SimpleVotingSystem.Api.csproj" />
+  <Project Path="SimpleVotingSystem.AppHost/SimpleVotingSystem.AppHost.csproj" Id="c8c9a422-68a0-46f0-9f1b-861471a942ae" />
+  <Project Path="SimpleVotingSystem.Client/SimpleVotingSystem.Client.csproj" />
+  <Project Path="SimpleVotingSystem.Polls/SimpleVotingSystem.Polls.csproj" />
+  <Project Path="SimpleVotingSystem.ServiceDefaults/SimpleVotingSystem.ServiceDefaults.csproj" />
+  <Project Path="SimpleVotingSystem.Silo/SimpleVotingSystem.Silo.csproj" />
+</Solution>

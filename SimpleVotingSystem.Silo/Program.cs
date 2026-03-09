@@ -4,19 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
-using Orleans.Hosting;
-using Orleans.Providers;
+using Orleans.Dashboard;
 using SimpleVotingSystem.Polls;
 using SimpleVotingSystem.Silo;
-
-//using var host = Host.CreateDefaultBuilder(args)
-//    .UseOrleans(siloBuilder =>
-//    {
-//        siloBuilder.UseLocalhostClustering();
-//        siloBuilder.UseDashboard();
-
-//        siloBuilder.AddMemoryGrainStorage("pollStore");
-//    }).Build();
 
 var siloPort = int.Parse(Environment.GetEnvironmentVariable("ORLEANS_SILO_PORT") ?? "11111");
 var gatewayPort = int.Parse(Environment.GetEnvironmentVariable("ORLEANS_GATEWAY_PORT") ?? "30001");
@@ -36,10 +26,10 @@ using var host = Host.CreateDefaultBuilder(args)
         config.Configure(app =>
         {
             app.UseRouting();
-            app.UseOrleansDashboard();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHealthChecksWithJsonResponse("/health");
+                endpoints.MapOrleansDashboard();
             });
         });
 
@@ -53,8 +43,6 @@ using var host = Host.CreateDefaultBuilder(args)
     .UseOrleans((context, siloBuilder) =>
     {
         var connectionString = context.Configuration.GetConnectionString("SondageAppCluster") ?? "Server=localhost;Database=SondageAppCluster;Integrated Security=true;TrustServerCertificate=True";
-
-        //siloBuilder.UseAzureStorageClustering(options => options.TableServiceClient = new Azure.Data.Tables.TableServiceClient("UseDevelopmentStorage=true"));
 
         //siloBuilder.UseLocalhostClustering(clusterId: "default", serviceId: "default");
         siloBuilder.UseAdoNetClustering(options =>
@@ -80,11 +68,11 @@ using var host = Host.CreateDefaultBuilder(args)
             options.GatewayPort = gatewayPort;
         });
 
-        siloBuilder.UseDashboard(options =>
+        siloBuilder.AddDashboard(options =>
         {
             //options.Port = int.Parse(Environment.GetEnvironmentVariable("DASHBOARD_PORT") ?? "0");
-            options.Host = "*";
-            options.HostSelf = true;
+            //options.Host = "*";
+            //options.HostSelf = true;
             options.CounterUpdateIntervalMs = 5000;
         });
 
@@ -99,7 +87,7 @@ using var host = Host.CreateDefaultBuilder(args)
         //    options.Invariant = "Microsoft.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
         //    options.ConnectionString = connectionString;
         //});
-        
+
 
     })
     .Build();
