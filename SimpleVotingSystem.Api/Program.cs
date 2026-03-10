@@ -30,7 +30,7 @@ builder.Services
             options.ServiceId = "sondage-app-orleans";
         });
 
-        clientBuilder.AddMemoryStreams("vote-streams");
+        //clientBuilder.AddMemoryStreams("votes-stream");
     });
 
 var app = builder.Build();

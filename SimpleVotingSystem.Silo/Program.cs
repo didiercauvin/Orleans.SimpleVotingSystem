@@ -47,7 +47,7 @@ using var host = Host.CreateDefaultBuilder(args)
         //siloBuilder.UseLocalhostClustering(clusterId: "default", serviceId: "default");
         siloBuilder.UseAdoNetClustering(options =>
         {
-            options.Invariant = "Microsoft.Data.SqlClient"; // Pour SQL Server
+            options.Invariant = "Microsoft.Data.SqlClient";
             options.ConnectionString = connectionString;
         });
 
@@ -70,14 +70,11 @@ using var host = Host.CreateDefaultBuilder(args)
 
         siloBuilder.AddDashboard(options =>
         {
-            //options.Port = int.Parse(Environment.GetEnvironmentVariable("DASHBOARD_PORT") ?? "0");
-            //options.Host = "*";
-            //options.HostSelf = true;
             options.CounterUpdateIntervalMs = 5000;
         });
 
         siloBuilder
-            .AddMemoryGrainStorage("pollStore")
+            //.AddMemoryGrainStorage("pollStore")
             .AddMemoryGrainStorage("PubSubStore")
             .AddMemoryStreams("votes-stream");
 
@@ -90,53 +87,6 @@ using var host = Host.CreateDefaultBuilder(args)
 
     })
     .Build();
-
-//var builder = Host.CreateApplicationBuilder(args);
-
-//// Aspire service defaults
-//builder.AddServiceDefaults();
-
-//// Orleans sans configuration manuelle — tout vient de l'AppHost
-//builder.UseOrleans(silo =>
-//{
-//    var connectionString = builder.Configuration.GetConnectionString("SondageAppCluster")
-//        ?? throw new InvalidOperationException("Connection string introuvable");
-
-//    // Force explicitement au lieu de laisser Aspire détecter
-//    silo.UseAdoNetClustering(options =>
-//    {
-//        options.Invariant = "Microsoft.Data.SqlClient";
-//        options.ConnectionString = connectionString;
-//    });
-
-//    silo.Configure<ClusterOptions>(options =>
-//    {
-//        options.ClusterId = "sondage-app-orleans";
-//        options.ServiceId = "sondage-app-orleans";
-//    });
-
-//    silo.Configure<EndpointOptions>(options =>
-//    {
-//        options.SiloPort = GetAvailablePort();
-//        options.GatewayPort = GetAvailablePort();
-//    });
-
-//    silo
-//        .AddMemoryGrainStorage("pollStore")
-//        .AddMemoryGrainStorage("PubSubStore")
-//        .AddMemoryStreams("votes-stream");
-
-//    silo.AddAdoNetGrainStorage("pollStore", options =>
-//    {
-//        options.Invariant = "Microsoft.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
-//        options.ConnectionString = connectionString;
-//    });
-//});
-
-//// Tes services custom
-//builder.Services.AddHealthChecks().AddCheck<SiloHealthcheck>("silo");
-
-//using var host = builder.Build();
 
 // Start the host
 await host.StartAsync();

@@ -9,34 +9,25 @@ namespace SimpleVotingSystem.Silo;
 
 public class SiloHealthcheck : IHealthCheck
 {
-    private readonly IClusterClient _clusterClient;
+    private readonly ISiloStatusOracle _siloStatusOracle;
 
-    public SiloHealthcheck(IClusterClient clusterClient)
+    public SiloHealthcheck(ISiloStatusOracle siloStatusOracle)
     {
-        _clusterClient = clusterClient;
+        _siloStatusOracle = siloStatusOracle;
     }
 
-    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+    public Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var mgmtGrain = _clusterClient.GetGrain<IManagementGrain>(0);
+        var status = _siloStatusOracle.CurrentStatus;
 
-            // Vérifier que le silo répond en récupérant les statistiques de base
-            var hosts = await mgmtGrain.GetHosts();
-
-            if (hosts != null && hosts.Count > 0)
-            {
-                return HealthCheckResult.Healthy("Le silo Orleans est opérationnel");
-            }
-            else
-            {
-                return HealthCheckResult.Degraded("Le silo Orleans est démarré mais aucun hôte n'est actif");
-            }
-        }
-        catch (Exception ex)
+        return Task.FromResult(status switch
         {
-            return HealthCheckResult.Unhealthy("Le silo Orleans n'est pas disponible", ex);
-        }
+            SiloStatus.Active => HealthCheckResult.Healthy("Silo actif"),
+            SiloStatus.ShuttingDown or
+            SiloStatus.Stopping => HealthCheckResult.Degraded($"Silo en cours d'arrêt : {status}"),
+            _ => HealthCheckResult.Unhealthy($"Silo non disponible : {status}")
+        });
     }
 }

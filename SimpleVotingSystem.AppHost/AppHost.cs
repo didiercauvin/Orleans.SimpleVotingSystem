@@ -16,7 +16,8 @@ var silo2 = builder.AddProject<Projects.SimpleVotingSystem_Silo>("silo-2")
     .WithEnvironment("ORLEANS_GATEWAY_PORT", "30002")
     .WithEnvironment("SILO_NAME", "JohnSnow")
     .WithEndpoint("http", e => e.Port = 5001)
-    .WithEndpoint("https", e => e.Port = 7001);
+    .WithEndpoint("https", e => e.Port = 7001)
+    .WithExplicitStart();
 
 var silo3 = builder.AddProject<Projects.SimpleVotingSystem_Silo>("silo-3")
     .WithReference(clusterConnection)
@@ -24,12 +25,11 @@ var silo3 = builder.AddProject<Projects.SimpleVotingSystem_Silo>("silo-3")
     .WithEnvironment("ORLEANS_GATEWAY_PORT", "30003")
     .WithEnvironment("SILO_NAME", "Superman")
     .WithEndpoint("http", e => e.Port = 5002)
-    .WithEndpoint("https", e => e.Port = 7002);
+    .WithEndpoint("https", e => e.Port = 7002)
+    .WithExplicitStart();
 
 builder.AddProject<Projects.SimpleVotingSystem_Api>("simplevotingsystem-api")
     .WithReference(clusterConnection)
-    .WaitFor(silo1)
-    .WaitFor(silo2)
-    .WaitFor(silo3);
+    .WaitFor(silo1);
 
 builder.Build().Run();
