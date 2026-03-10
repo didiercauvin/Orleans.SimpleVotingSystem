@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleVotingSystem.Polls\SimpleVotingSystem.Polls.csproj" />
+    <ProjectReference Include="..\SimpleVotingSystem.ServiceDefaults\SimpleVotingSystem.ServiceDefaults.csproj" />
   </ItemGroup>
   
 </Project>

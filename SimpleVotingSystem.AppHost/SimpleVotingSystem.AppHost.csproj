@@ -10,9 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Orleans" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" />
+    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SimpleVotingSystem.Api\SimpleVotingSystem.Api.csproj" />
     <ProjectReference Include="..\SimpleVotingSystem.Silo\SimpleVotingSystem.Silo.csproj" />
   </ItemGroup>
 

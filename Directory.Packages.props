@@ -5,6 +5,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.Orleans" Version="13.1.2" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.1.2" />
+    <PackageVersion Include="Aspire.Microsoft.Data.SqlClient" Version="13.1.2" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.4" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.3" />
@@ -22,5 +24,12 @@
     <PackageVersion Include="OrleansDashboard" Version="8.2.0" />
     <PackageVersion Include="Spectre.Console" Version="0.51.1" />
     <PackageVersion Include="System.Text.Json" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.1.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.1.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
   </ItemGroup>
 </Project>

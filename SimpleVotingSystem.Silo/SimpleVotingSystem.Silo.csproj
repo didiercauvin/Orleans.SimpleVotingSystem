@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
@@ -22,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleVotingSystem.Polls\SimpleVotingSystem.Polls.csproj" />
+    <ProjectReference Include="..\SimpleVotingSystem.ServiceDefaults\SimpleVotingSystem.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,8 @@ using SimpleVotingSystem.Api.Polls;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 var connectionString = builder.Configuration.GetConnectionString("SondageAppCluster");
 
 // Add services to the container.
@@ -32,6 +34,8 @@ builder.Services
     });
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 

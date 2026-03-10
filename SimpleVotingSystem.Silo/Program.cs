@@ -42,7 +42,7 @@ using var host = Host.CreateDefaultBuilder(args)
     })
     .UseOrleans((context, siloBuilder) =>
     {
-        var connectionString = context.Configuration.GetConnectionString("SondageAppCluster") ?? "Server=localhost;Database=SondageAppCluster;Integrated Security=true;TrustServerCertificate=True";
+        var connectionString = context.Configuration.GetConnectionString("SondageAppCluster") ?? throw new InvalidOperationException("Connection string introuvable");
 
         //siloBuilder.UseLocalhostClustering(clusterId: "default", serviceId: "default");
         siloBuilder.UseAdoNetClustering(options =>
@@ -81,16 +81,62 @@ using var host = Host.CreateDefaultBuilder(args)
             .AddMemoryGrainStorage("PubSubStore")
             .AddMemoryStreams("votes-stream");
 
-        //siloBuilder
-        //.AddAdoNetGrainStorage("pollStore", options =>
-        //{
-        //    options.Invariant = "Microsoft.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
-        //    options.ConnectionString = connectionString;
-        //});
+        siloBuilder.AddAdoNetGrainStorage("pollStore", options =>
+        {
+            options.Invariant = "Microsoft.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
+            options.ConnectionString = connectionString;
+        });
 
 
     })
     .Build();
+
+//var builder = Host.CreateApplicationBuilder(args);
+
+//// Aspire service defaults
+//builder.AddServiceDefaults();
+
+//// Orleans sans configuration manuelle — tout vient de l'AppHost
+//builder.UseOrleans(silo =>
+//{
+//    var connectionString = builder.Configuration.GetConnectionString("SondageAppCluster")
+//        ?? throw new InvalidOperationException("Connection string introuvable");
+
+//    // Force explicitement au lieu de laisser Aspire détecter
+//    silo.UseAdoNetClustering(options =>
+//    {
+//        options.Invariant = "Microsoft.Data.SqlClient";
+//        options.ConnectionString = connectionString;
+//    });
+
+//    silo.Configure<ClusterOptions>(options =>
+//    {
+//        options.ClusterId = "sondage-app-orleans";
+//        options.ServiceId = "sondage-app-orleans";
+//    });
+
+//    silo.Configure<EndpointOptions>(options =>
+//    {
+//        options.SiloPort = GetAvailablePort();
+//        options.GatewayPort = GetAvailablePort();
+//    });
+
+//    silo
+//        .AddMemoryGrainStorage("pollStore")
+//        .AddMemoryGrainStorage("PubSubStore")
+//        .AddMemoryStreams("votes-stream");
+
+//    silo.AddAdoNetGrainStorage("pollStore", options =>
+//    {
+//        options.Invariant = "Microsoft.Data.SqlClient"; // ou "Microsoft.Data.SqlClient"
+//        options.ConnectionString = connectionString;
+//    });
+//});
+
+//// Tes services custom
+//builder.Services.AddHealthChecks().AddCheck<SiloHealthcheck>("silo");
+
+//using var host = builder.Build();
 
 // Start the host
 await host.StartAsync();
